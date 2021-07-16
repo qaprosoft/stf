@@ -101,7 +101,6 @@ module.exports = function DeviceScreenDirective(
         }
 
         var adjustedBoundSize
-        var cachedEnabled = false
 
         function updateBounds() {
           function adjustBoundedSize(w, h) {
@@ -157,10 +156,16 @@ module.exports = function DeviceScreenDirective(
         }
 
         function shouldUpdateScreen() {
+          console.log('scope.$parent.showScreen: ', scope.$parent.showScreen)
+          console.log('device.using: ', device.using)
+          console.log('!PageVisibilityService.hidden: ', !PageVisibilityService.hidden)
+          console.log('ws.readyState === WebSocket.OPEN: ', ws.readyState === WebSocket.OPEN)
+
+          //forcibly return true to update screen!
           return (
             // NO if the user has disabled the screen.
             scope.$parent.showScreen &&
-            // NO if we're not even using the device anymore.
+//            // NO if we're not even using the device anymore.
             device.using &&
             // NO if the page is not visible (e.g. background tab).
             !PageVisibilityService.hidden &&
@@ -172,11 +177,10 @@ module.exports = function DeviceScreenDirective(
 
         function checkEnabled() {
           var newEnabled = shouldUpdateScreen()
+          console.log('shouldUpdateScreen()=', newEnabled)
 
-          if (newEnabled === cachedEnabled) {
-            updateBounds()
-          }
-          else if (newEnabled) {
+          if (newEnabled) {
+            console.log('updateBounds() and onScreenInterestGained()')
             updateBounds()
             onScreenInterestGained()
           }
@@ -185,11 +189,12 @@ module.exports = function DeviceScreenDirective(
             onScreenInterestLost()
           }
 
-          cachedEnabled = newEnabled
         }
 
         function onScreenInterestGained() {
+          console.log('onScreenInterestGained()')
           if (ws.readyState === WebSocket.OPEN) {
+            console.log('ws.readyState === WebSocket.OPEN')
             ws.send('size ' + adjustedBoundSize.w + 'x' + adjustedBoundSize.h)
             ws.send('on')
           }
