@@ -63,6 +63,6 @@ module.exports = function GroupServiceFactory(
       })
   }
 
-  console.log('group service kick device5:', device.model, '; using:', device.using, '; usable:', device.usable)
+  console.log('group service kick device5')
   return groupService
 }
